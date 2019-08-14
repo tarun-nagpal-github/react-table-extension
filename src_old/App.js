@@ -10,11 +10,10 @@ import { Container, Jumbotron, Button } from "react-bootstrap";
 // data records for the table
 import { data } from "./utils/TableData";
 const CheckboxTable = checkboxHOC(ReactTable);
-// const chance = new Chance();
 
-class App extends Component {  
-  constructor(props){
-    super(props)
+class App extends Component {
+  constructor(props) {
+    super(props);
     this.state = {
       selectAll: false,
       columns: [
@@ -27,30 +26,11 @@ class App extends Component {
           accessor: "age"
         }
       ],
-      data : data,
-      selection: []
-    }
+      data: data
+    };
   }
 
-  isSelected = key => {
-    return this.state.selection.includes(key);
-  };
-
-  // getData() {
-  //   const data = testData.map(item => {
-  //     // using chancejs to generate guid
-  //     // shortid is probably better but seems to have performance issues
-  //     // on codesandbox.io
-  //     const _id = chance.guid();
-  //     return {
-  //       _id,
-  //       ...item
-  //     };
-  //   });
-  //   return data;
-  // }
-
-  toggleAll = () => {  
+  toggleAll = () => {
     const selectAll = this.state.selectAll ? false : true;
     const selection = [];
     if (selectAll) {
@@ -67,18 +47,9 @@ class App extends Component {
   };
 
   toggleSelection = (key, shift, row) => {
-    console.log(key);    
-  /*
-      Implementation of how to manage the selection state is up to the developer.
-      This implementation uses an array stored in the component state.
-      Other implementations could use object keys, a Javascript Set, or Redux... etc.
-    */
-    // start off with the existing state
     let selection = [...this.state.selection];
     const keyIndex = selection.indexOf(key);
-    // check to see if the key exists
     if (keyIndex >= 0) {
-      // it does exist so we will remove it using destructing
       selection = [
         ...selection.slice(0, keyIndex),
         ...selection.slice(keyIndex + 1)
@@ -91,19 +62,21 @@ class App extends Component {
     this.setState({ selection });
   };
 
-
-
-  render() {    
+  render() {
     const { toggleSelection, toggleAll, isSelected } = this;
-    const { data, columns, selectAll, showFilters, anchorEl, alert} = this.state;
+    const {
+      data,
+      columns,
+      selectAll
+    } = this.state;
     const checkboxProps = {
       selectAll,
       isSelected,
       toggleSelection,
       toggleAll,
-      selectType: "checkbox",
-      // getTrProps: (s, r) => {      
-      //   let selected = r ? this.isSelected(r.original._id) : false; 
+      selectType: "checkbox"
+      // getTrProps: (s, r) => {
+      //   let selected = r ? this.isSelected(r.original._id) : false;
       //   selected = this.isExpanded(s, r, r.index) ? true : selected;
       //   this.rowState= s;
       //   return {
@@ -114,35 +87,46 @@ class App extends Component {
       //   };
       // }
     };
-   
+
     return (
       <React.Fragment>
         <Container>
-        {/* <Jumbotron>
-          <h1>React Table Extension   </h1>
-          <p>
-           Trying to experiment with react tables
-          </p>
-          <p>            
-            <a  target="_blank" href="https://www.npmjs.com/package/react-table" className="btn btn-primary" style={{color: "white" , cursor: "pointer"}}>React Table</a>
-          </p>
-        </Jumbotron>           */}
-            <CheckboxTable
-              ref={r => (this.checkboxTable = r)}
-              data={data}
-              columns={columns}
-              defaultPageSize={3}
-              pageSizeOptions={[3, 6]}
-              showPagination={true}
-              showPaginationTop={true}
-              showPageJump={true}
-              collapseOnSortingChange={true}              
-              filterable={true}              
-              {...checkboxProps}              
-            />
-          </Container>        
+          <Jumbotron>
+            <h1>React Table Extension </h1>
+            <p>Trying to experiment with react tables</p>
+            <p>
+              {/* <Button variant="primary">Learn more</Button> */}
+              <a
+                target="_blank"
+                href="https://www.npmjs.com/package/react-table"
+                className="btn btn-primary"
+                style={{ color: "white", cursor: "pointer" }}
+              >
+                React Table
+              </a>
+            </p>
+          </Jumbotron>
+
+          <CheckboxTable
+            ref={r => (this.checkboxTable = r)}
+            data={data}
+            columns={columns}
+            defaultPageSize={3}
+            pageSizeOptions={[3, 6]}
+            showPagination={true}
+            showPaginationTop={true}
+            showPageJump={true}
+            collapseOnSortingChange={true}
+            resizable={true}
+            filterable={true}
+            isSelected={true}
+            className="-striped -highlight grid"
+            {...checkboxProps}
+          />
+        </Container>
       </React.Fragment>
     );
   }
 }
+
 export default App;
