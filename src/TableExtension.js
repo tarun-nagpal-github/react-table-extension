@@ -13,6 +13,8 @@ const CheckboxTable = checkboxHOC(ReactTable);
 class TableExtension extends React.Component {
   constructor(props) {
     super(props);
+    const columns = this.getColumns(props.parentRecords);
+    this.selectedColumns = this.getSelectedColumns(columns);    
     this.state = {
         selectAll : false,
         selection: [],
@@ -20,19 +22,17 @@ class TableExtension extends React.Component {
         parentColumns: props.parentColumns,
         childRecords: props.childRecords,
         childColumns: props.childColumns,
-        fileteredColumns: [],
-        selectedColumns: []
+        fileteredColumns: columns,
+        selectedColumns: this.selectedColumns
     }
-    this.selectedColumns = this.getSelectedColumns(props.parentColumns);
+    this.selectedColumnsGlobal = this.getSelectedColumns(props.parentColumns);
+    
   }
 
   handleSelectedItem = (event) => {
     let fileteredColumns = [];
     let selectedColumns=event.target.value;   
-    console.log("Selected Colum");
-    console.log(this.state);
-    console.log("Selected Colum");
-
+ 
     selectedColumns.forEach(column => {    
       let name =[];
       name.push(column)
@@ -52,36 +52,35 @@ class TableExtension extends React.Component {
   }
 
 
-  getSelectedColumns(columns) {
-    let selectedColumns = [];
-    let fileteredColumns = [];
-    columns.forEach(column => {  
-      let name =[];
-      name.push(column);      
-       selectedColumns.push(column.Header);
-       fileteredColumns.push({
-        accessor: column.Header,
-        Header: column.Header,
-        filterMethod: (filter,  row) =>
-        matchSorter(row, filter.value, { keys: name }),
-        filterAll: true             
-      });
-    }); 
+  getColumns(data) {
+    const columns = [];
+    const sample = data[0];    
 
-
-    this.setState({            
-      fileteredColumns : fileteredColumns
-    }, ()=> {
-      console.log("this.state Callback BEFORE ");
-      console.log(this.state);
-      console.log("this.state");
+    Object.keys(sample).forEach(key => {
+      if (key !== "_id") {
+        let column=[]
+        column.push(key)
+        columns.push({
+          accessor: key,
+          Header: key,
+          filterMethod: (filter, row) =>
+          matchSorter(row, filter.value, { keys: column }),
+          filterAll: true
+        });
+      }
     });
+    this.fileteredColumns = columns;
+    return columns;
+  }
 
-    
-    console.log("this.state Callback AFTER");
-      console.log(this.state);
-      console.log("this.state");
-    // debugger;
+
+  getSelectedColumns(columns) {
+
+    let selectedColumns = [];
+    columns.forEach(column => {
+      if (column.Header !== "Action")
+       selectedColumns.push(column.Header);
+    });
     return selectedColumns;
   }
 
@@ -136,7 +135,7 @@ class TableExtension extends React.Component {
   };
 
   showMultiselectComponent = () => {    
-    let selectedColumns = this.state.selectedColumns;
+    let selectedColumns = this.selectedColumns;    
     return (
       <div>
         <FormControl className="mb-10 ml-16"
@@ -180,7 +179,7 @@ class TableExtension extends React.Component {
     );
   }
 
-  render() {
+  render() {    
     const { toggleSelection, toggleAll, isSelected } = this;
     const {      
       selectAll,
