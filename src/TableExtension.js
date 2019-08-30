@@ -2,12 +2,11 @@ import React, { Component } from "react";
 import checkboxHOC from "react-table/lib/hoc/selectTable";
 import {FormControl, Input,  Select, Checkbox, MenuItem} from "@material-ui/core";
 
-
-
 // react table lib
 import ReactTable from "react-table";
 import "react-table/react-table.css";
 import matchSorter from "match-sorter";
+import TableColumnFilter  from "./TableColumnFilter";
 const CheckboxTable = checkboxHOC(ReactTable);
 
 class TableExtension extends React.Component {
@@ -22,21 +21,19 @@ class TableExtension extends React.Component {
         parentColumns: props.parentColumns,
         childRecords: props.childRecords,
         childColumns: props.childColumns,
-        fileteredColumns: columns,
+        filteredColumns: columns,
         selectedColumns: this.selectedColumns
     }
-    this.selectedColumnsGlobal = this.getSelectedColumns(props.parentColumns);
-    
   }
 
   handleSelectedItem = (event) => {
-    let fileteredColumns = [];
+    let filteredColumns = [];
     let selectedColumns=event.target.value;   
  
     selectedColumns.forEach(column => {    
       let name =[];
       name.push(column)
-      fileteredColumns.push({
+      filteredColumns.push({
         accessor: column,
         Header: column ,
         filterMethod: (filter,  row) =>
@@ -47,7 +44,7 @@ class TableExtension extends React.Component {
    
     this.setState({      
       selectedColumns:event.target.value,
-      fileteredColumns
+      filteredColumns
     })
   }
 
@@ -69,13 +66,12 @@ class TableExtension extends React.Component {
         });
       }
     });
-    this.fileteredColumns = columns;
+    this.filteredColumns = columns;
     return columns;
   }
 
 
   getSelectedColumns(columns) {
-
     let selectedColumns = [];
     columns.forEach(column => {
       if (column.Header !== "Action")
@@ -135,7 +131,10 @@ class TableExtension extends React.Component {
   };
 
   showMultiselectComponent = () => {    
-    let selectedColumns = this.selectedColumns;    
+    let selectedColumns = this.selectedColumns;   
+    console.log("SATE");
+    console.log(this.state);
+    console.log("SATE");
     return (
       <div>
         <FormControl className="mb-10 ml-16"
@@ -166,6 +165,7 @@ class TableExtension extends React.Component {
           >
             {selectedColumns.map(name => (
               <MenuItem key={name} value={name}>
+                {console.log("786786"+ this.state.selectedColumns)}
                 <Checkbox
                   checked={this.state.selectedColumns.indexOf(name) > -1}
                   style={{ width: 45 }}
@@ -179,7 +179,14 @@ class TableExtension extends React.Component {
     );
   }
 
+  stateUpdate =  (selectedColumn, filteredColumns) => {
+    this.setState({      
+      selectedColumns:selectedColumn,
+      filteredColumns
+    })
+  }
   render() {    
+    
     const { toggleSelection, toggleAll, isSelected } = this;
     const {      
       selectAll,
@@ -209,11 +216,16 @@ class TableExtension extends React.Component {
     
     return (
       <React.Fragment>
-     <this.showMultiselectComponent />
+        <TableColumnFilter 
+        columns={this.filteredColumns} 
+        onUpdateState={this.stateUpdate}
+        selectedColumns={this.selectedColumns}        
+        />
+     {/* <this.showMultiselectComponent /> */}
       <CheckboxTable
         ref={r => (this.checkboxTable = r)}
         data={this.state.parentRecords}        
-        columns={this.state.fileteredColumns}
+        columns={this.state.filteredColumns}
         defaultPageSize={3}
         pageSizeOptions={[3, 6]}
         showPagination={true}
