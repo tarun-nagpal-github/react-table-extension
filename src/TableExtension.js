@@ -1,49 +1,49 @@
-import React, { Component } from "react";
+import React from "react";
 import checkboxHOC from "react-table/lib/hoc/selectTable";
-import {FormControl, Input,  Select, Checkbox, MenuItem} from "@material-ui/core";
+import { FormControl, Input, Select, Checkbox, MenuItem } from "@material-ui/core";
 
 // react table lib
 import ReactTable from "react-table";
 import "react-table/react-table.css";
 import matchSorter from "match-sorter";
-import TableColumnFilter  from "./TableColumnFilter";
+import TableColumnFilter from "./TableColumnFilter";
 const CheckboxTable = checkboxHOC(ReactTable);
 
 class TableExtension extends React.Component {
   constructor(props) {
     super(props);
     const columns = this.getColumns(props.parentRecords);
-    this.selectedColumns = this.getSelectedColumns(columns);    
+    this.selectedColumns = this.getSelectedColumns(columns);
     this.state = {
-        selectAll : false,
-        selection: [],
-        parentRecords: props.parentRecords,
-        parentColumns: props.parentColumns,
-        childRecords: props.childRecords,
-        childColumns: props.childColumns,
-        filteredColumns: columns,
-        selectedColumns: this.selectedColumns
+      selectAll: false,
+      selection: [],
+      parentRecords: props.parentRecords,
+      parentColumns: props.parentColumns,
+      childRecords: props.childRecords,
+      childColumns: props.childColumns,
+      filteredColumns: columns,
+      selectedColumns: this.selectedColumns
     }
   }
 
   handleSelectedItem = (event) => {
     let filteredColumns = [];
-    let selectedColumns=event.target.value;   
- 
-    selectedColumns.forEach(column => {    
-      let name =[];
+    let selectedColumns = event.target.value;
+
+    selectedColumns.forEach(column => {
+      let name = [];
       name.push(column)
       filteredColumns.push({
         accessor: column,
-        Header: column ,
-        filterMethod: (filter,  row) =>
-        matchSorter(row, filter.value, { keys: name }),
-        filterAll: true             
+        Header: column,
+        filterMethod: (filter, row) =>
+          matchSorter(row, filter.value, { keys: name }),
+        filterAll: true
       });
     });
-   
-    this.setState({      
-      selectedColumns:event.target.value,
+
+    this.setState({
+      selectedColumns: event.target.value,
       filteredColumns
     })
   }
@@ -51,17 +51,17 @@ class TableExtension extends React.Component {
 
   getColumns(data) {
     const columns = [];
-    const sample = data[0];    
+    const sample = data[0];
 
     Object.keys(sample).forEach(key => {
       if (key !== "_id") {
-        let column=[]
+        let column = []
         column.push(key)
         columns.push({
           accessor: key,
           Header: key,
           filterMethod: (filter, row) =>
-          matchSorter(row, filter.value, { keys: column }),
+            matchSorter(row, filter.value, { keys: column }),
           filterAll: true
         });
       }
@@ -75,7 +75,7 @@ class TableExtension extends React.Component {
     let selectedColumns = [];
     columns.forEach(column => {
       if (column.Header !== "Action")
-       selectedColumns.push(column.Header);
+        selectedColumns.push(column.Header);
     });
     return selectedColumns;
   }
@@ -86,15 +86,15 @@ class TableExtension extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     this.setState({
-        parentRecords: nextProps.parentRecords,
-        parentColumns: nextProps.parentColumns,
-        childRecords: nextProps.childRecords,
-        childColumns: nextProps.childColumns        
+      parentRecords: nextProps.parentRecords,
+      parentColumns: nextProps.parentColumns,
+      childRecords: nextProps.childRecords,
+      childColumns: nextProps.childColumns
     });
-}
+  }
 
 
-  toggleSelection = (key, shift, row) => {     
+  toggleSelection = (key, shift, row) => {
     // start off with the existing state
     let selection = [...this.state.selection];
     const keyIndex = selection.indexOf(key);
@@ -114,7 +114,7 @@ class TableExtension extends React.Component {
   };
 
 
-  toggleAll = () => {      
+  toggleAll = () => {
     const selectAll = this.state.selectAll ? false : true;
     const selection = [];
     if (selectAll) {
@@ -126,19 +126,19 @@ class TableExtension extends React.Component {
       currentRecords.forEach(item => {
         selection.push(item._original._id);
       });
-    }    
+    }
     this.setState({ selectAll, selection });
   };
 
-  showMultiselectComponent = () => {    
-    let selectedColumns = this.selectedColumns;   
+  showMultiselectComponent = () => {
+    let selectedColumns = this.selectedColumns;
     console.log("SATE");
     console.log(this.state);
     console.log("SATE");
     return (
       <div>
         <FormControl className="mb-10 ml-16"
-          style={{            
+          style={{
             minWidth: 120,
             maxWidth: 300
           }}
@@ -165,7 +165,7 @@ class TableExtension extends React.Component {
           >
             {selectedColumns.map(name => (
               <MenuItem key={name} value={name}>
-                {console.log("786786"+ this.state.selectedColumns)}
+                {console.log("786786" + this.state.selectedColumns)}
                 <Checkbox
                   checked={this.state.selectedColumns.indexOf(name) > -1}
                   style={{ width: 45 }}
@@ -179,20 +179,17 @@ class TableExtension extends React.Component {
     );
   }
 
-  stateUpdate =  (selectedColumn, filteredColumns) => {
-    this.setState({      
-      selectedColumns:selectedColumn,
+  stateUpdate = (selectedColumn, filteredColumns) => {
+    this.setState({
+      selectedColumns: selectedColumn,
       filteredColumns
     })
   }
-  render() {    
-    
+  render() {
+
     const { toggleSelection, toggleAll, isSelected } = this;
-    const {      
-      selectAll,
-      showFilters,
-      anchorEl,
-      alert
+    const {
+      selectAll
     } = this.state;
     const checkboxProps = {
       selectAll,
@@ -213,27 +210,27 @@ class TableExtension extends React.Component {
       }
     };
 
-    
+
     return (
       <React.Fragment>
-        <TableColumnFilter 
-        columns={this.filteredColumns} 
-        onUpdateState={this.stateUpdate}
-        selectedColumns={this.selectedColumns}        
+        <TableColumnFilter
+          columns={this.filteredColumns}
+          onUpdateState={this.stateUpdate}
+          selectedColumns={this.selectedColumns}
         />
-     {/* <this.showMultiselectComponent /> */}
-      <CheckboxTable
-        ref={r => (this.checkboxTable = r)}
-        data={this.state.parentRecords}        
-        columns={this.state.filteredColumns}
-        defaultPageSize={3}
-        pageSizeOptions={[3, 6]}
-        showPagination={true}
-        showPaginationTop={true}
-        showPageJump={true}
-        collapseOnSortingChange={true}
-        filterable={true}        
-        SubComponent={row => {
+        {/* <this.showMultiselectComponent /> */}
+        <CheckboxTable
+          ref={r => (this.checkboxTable = r)}
+          data={this.state.parentRecords}
+          columns={this.state.filteredColumns}
+          defaultPageSize={3}
+          pageSizeOptions={[3, 6]}
+          showPagination={true}
+          showPaginationTop={true}
+          showPageJump={true}
+          collapseOnSortingChange={true}
+          filterable={true}
+          SubComponent={row => {
             return (
               <div style={{ padding: "20px" }}>
                 <h6>Sub Component</h6>
@@ -259,8 +256,8 @@ class TableExtension extends React.Component {
               </div>
             );
           }}
-        {...checkboxProps}
-      />
+          {...checkboxProps}
+        />
       </React.Fragment>
     );
   }
